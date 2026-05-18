@@ -1,0 +1,149 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'net.neoforged.moddev' version '2.0.140'
+    id 'idea'
+}
+
+import static com.github.moistmason.reginald.building.BuildConstants.*
+
+tasks.named('wrapper', Wrapper).configure {
+    distributionType = Wrapper.DistributionType.BIN
+}
+
+version = MOD_VERSION
+group = MOD_GROUP
+
+repositories {}
+
+base {
+    archivesName = MOD_ID
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+    toolchain.languageVersion = JavaLanguageVersion.of(JAVA_VERSION)
+}
+
+javadoc {
+    source = sourceSets.main.allJava
+    destinationDir = project.file('build/docs/')
+}
+
+neoForge {
+    version = NEO_VERSION
+
+    parchment {
+        mappingsVersion = PARCHMENT_VERSION
+        minecraftVersion = MINECRAFT_VERSION
+    }
+
+    // accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
+
+    runs {
+        client {
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', MOD_ID
+        }
+
+        server {
+            server()
+            programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', MOD_ID
+        }
+		
+        gameTestServer {
+            type = "gameTestServer"
+            systemProperty 'neoforge.enabledGameTestNamespaces', MOD_ID
+        }
+
+        data {
+            data()
+            programArguments.addAll '--mod', MOD_ID, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+dependencies {}
+
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+    var replaceProperties = [
+            minecraft_version      : MINECRAFT_VERSION,
+            minecraft_version_range: MINECRAFT_VERSION_RANGE,
+            neo_version            : NEO_VERSION,
+            loader_version_range   : LOADER_VERSION_RANGE,
+            mod_id                 : MOD_ID,
+            mod_name               : MOD_NAME,
+            mod_license            : MOD_LICENSE,
+            mod_version            : MOD_VERSION,
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
+}
+
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            from components.java
+            groupId = project.group
+            artifactId = project.name
+            version = project.version
+            pom {
+                name = artifactId
+                description = 'Library mod for mods developed by moist-mason'
+                licenses {
+                    license {
+                        name = 'MIT-License'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'moist-mason'
+                        name = 'Mason'
+                        url = 'https//github.com/moist-mason/'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = 'masons-mod-maven'
+            url = '../masons-mod-maven/'
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}
