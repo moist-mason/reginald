@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.140'
+    id 'net.neoforged.moddev' version '2.0.141'
     id 'idea'
 }
 
@@ -34,10 +34,12 @@ javadoc {
 neoForge {
     version = NEO_VERSION
 
+    /*
     parchment {
         mappingsVersion = PARCHMENT_VERSION
         minecraftVersion = MINECRAFT_VERSION
     }
+     */
 
     // accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -59,7 +61,7 @@ neoForge {
         }
 
         data {
-            data()
+            clientData()
             programArguments.addAll '--mod', MOD_ID, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
         }
 
@@ -89,7 +91,6 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             minecraft_version      : MINECRAFT_VERSION,
             minecraft_version_range: MINECRAFT_VERSION_RANGE,
             neo_version            : NEO_VERSION,
-            loader_version_range   : LOADER_VERSION_RANGE,
             mod_id                 : MOD_ID,
             mod_name               : MOD_NAME,
             mod_license            : MOD_LICENSE,
