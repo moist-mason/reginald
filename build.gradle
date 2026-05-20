@@ -39,8 +39,6 @@ neoForge {
         minecraftVersion = MINECRAFT_VERSION
     }
 
-    // accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
-
     runs {
         client {
             client()
