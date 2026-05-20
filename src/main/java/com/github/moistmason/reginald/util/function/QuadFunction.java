@@ -2,5 +2,5 @@ package com.github.moistmason.reginald.util.function;
 
 @FunctionalInterface
 public interface QuadFunction<T, U, V, W, R> {
-    R apply(T t, U u, V v, W w);
+    R apply(final T t, final U u, final V v, final W w);
 }

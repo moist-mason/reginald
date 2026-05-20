@@ -42,17 +42,17 @@ public class ArmorMaterialBuilder {
         return this;
     }
 
-    public ArmorMaterialBuilder protection(EnumMap<Type, Integer> protection) {
+    public ArmorMaterialBuilder protection(final EnumMap<Type, Integer> protection) {
         this.protection = protection;
         return this;
     }
 
-    public ArmorMaterialBuilder protection(int enchantability) {
+    public ArmorMaterialBuilder protection(final int enchantability) {
         this.enchantability = enchantability;
         return this;
     }
 
-    public ArmorMaterialBuilder toughness(float toughness) {
+    public ArmorMaterialBuilder toughness(final float toughness) {
         this.toughness = toughness;
         return this;
     }
